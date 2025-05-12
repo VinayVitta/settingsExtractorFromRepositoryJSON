@@ -39,3 +39,32 @@ def write_dataframe_to_csv(df, csv_file_path):
         sys.stdout.write(f"Successfully wrote data to {csv_file_path}")
     except Exception as e:
         print(f"Error writing to CSV file: {e}")
+
+
+def load_and_prefix_columns(file_path, prefix="qem_"):
+    """
+    Loads a tab-separated or comma-separated file and appends a prefix to all column names.
+
+    Args:
+        file_path (str): Path to the file.
+        prefix (str): Prefix to prepend to each column name.
+
+    Returns:
+        pd.DataFrame: DataFrame with prefixed column names.
+    """
+    # Load the file (try CSV first, fallback to tab-delimited)
+    try:
+        df = pd.read_csv(file_path)
+    except Exception:
+        df = pd.read_csv(file_path, delimiter='\t')
+
+    # Prefix column names
+    df.columns = [f"{prefix}{col.strip()}" for col in df.columns]
+    return df
+
+
+# Example usage
+file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\AemTasks_2025-04-25_13.35.53.8.tsv"
+df = load_and_prefix_columns(file_path, prefix="qem_")
+
+print(df.head())  # Display first few rows

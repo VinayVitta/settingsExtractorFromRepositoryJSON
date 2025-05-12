@@ -47,16 +47,11 @@ def extract_azure_adls_settings(json_data, target_ep_name):
                 'target_adls_storageType': db_settings.get('storageType'),
                 'target_adls_fileSystem': db_settings.get('fileSystem'),
                 'target_adls_proxyStorage': db_settings.get('proxyStorage'),
-                'target_adls_proxyActiveDirectory': db_settings.get('proxyActiveDirectory')
+                'target_adls_proxyActiveDirectory': db_settings.get('proxyActiveDirectory'),
+                'target_db_type': database.get('type_id'),
             }
             data.append(row_data)
-            column_names = ['target_endpoint_name', 'target_additional_properties', 'target_username',
-                            'target_server', 'target_database', 'target_maxFileSize', 'target_adls_folder',
-                            'target_adls_addColumnName', 'target_adls_cdcMaxBatchInterval', 'target_adls_compressionType',
-                            'target_adls_createMetadata', 'target_adls_fileFormat', 'target_adls_adlstenantid',
-                            'target_adls_adlsclientappid', 'target_adls_proxyHost', 'target_adls_proxyPort',
-                            'target_adls_proxyScheme', 'target_adls_useProxyServer', 'target_adls_storageType', 'target_adls_fileSystem',
-                            'target_adls_proxyStorage','target_adls_proxyActiveDirectory' ]
+            column_names = list(row_data.keys())
             break
 
     return data, column_names

@@ -3,7 +3,7 @@ import json
 import re
 
 
-def extract_db2zos_settings(json_data, source_ep_name):
+def extract_mongodb_settings(json_data, source_ep_name):
     """
     Extracts Oracle-specific settings from a JSON data structure.
 
@@ -24,23 +24,32 @@ def extract_db2zos_settings(json_data, source_ep_name):
     column_names = []
 
     for database in databases:
-        if database['name'] == source_ep_name and database['type_id'] == 'DB2ZOS_NATIVE_COMPONENT_TYPE':
+        if database['name'] == source_ep_name and database['type_id'] == 'CUSTOM_COMPONENT_TYPE':
             db_settings = database.get('db_settings', {})  # Safely get nested settings
-            db2zos_source_server = db_settings.get('server', None)
+            conn_info_str = db_settings.get("connectioninfo", "{}")
+            try:
+                conn_info = json.loads(conn_info_str)
+            except json.JSONDecodeError:
+                return pd.DataFrame()
 
             # Construct the data dictionary.  Use get() with defaults.
             row_data = {
-                'source_server': db_settings.get('server', 'default'),
+                'source_server': conn_info.get("host", ""),
                 'source_endpoint_name': database.get('name'),
                 'source_db_type': database.get('type_id'),
                 'source_db_role': database.get('role'),
-                'source_db_user': db_settings.get('username'),
                 'source_logstreamstagingtask': db_settings.get('logstreamstagingtask', 'None'),
-                'source_database': db_settings.get('databaseName'),
-                'source_db2zos_connectMode': db_settings.get('connectMode'),
-                'source_db2zos_ifi306SpName': db_settings.get('ifi306SpName'),
-                'source_db2zos_ignoreCreateTable': db_settings.get('ignoreCreateTable'),
-
+                'source_database': conn_info.get("dbName", ""),
+                "auth_method": conn_info.get("auth", ""),
+                "IAM_credential_source": conn_info.get("iAMcred", ""),
+                "username": conn_info.get("username", ""),
+                "use_ssl": conn_info.get("useSsl", False),
+                "json_mode": conn_info.get("jsonMode", ""),
+                "polling_interval": conn_info.get("pollingInterval", ""),
+                "polling_interval_on_start": conn_info.get("pollingIntervalOnStart", ""),
+                "generated_id": conn_info.get("generatedId", ""),
+                "id_size": conn_info.get("idSize", ""),
+                "additional_options": conn_info.get("options", "")
             }
             data.append(row_data)
 
@@ -50,7 +59,7 @@ def extract_db2zos_settings(json_data, source_ep_name):
     return data, column_names  # Return the data and column names
 
 
-def extract_db2zos_data_to_dataframe(json_data, source_name):
+def extract_mongodb_data_to_dataframe(json_data, source_name):
     """
     Extracts relevant data from JSON and converts it into a Pandas DataFrame.
 
@@ -65,7 +74,7 @@ def extract_db2zos_data_to_dataframe(json_data, source_name):
     try:
         with open(json_data, 'r') as f:
             json_content = json.load(f)
-        data, column_names = extract_db2zos_settings(json_content, source_name)  # Pass json_content, not file path
+        data, column_names = extract_mongodb_settings(json_content, source_name)  # Pass json_content, not file path
         if data:
             return pd.DataFrame(data, columns=column_names)
         else:
@@ -96,9 +105,9 @@ def main():
     """
     file_path_nondef = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\tlpreplcdc-004.json"
     csv_file_path = r"C:\Users\VIT\Downloads\oracle_settings.csv"
-    source_name = 'DB2_LS'
+    source_name = 'src_mgdb_enterprise_LS'
 
-    df = extract_db2zos_data_to_dataframe(file_path_nondef, source_name)
+    df = extract_mongodb_data_to_dataframe(file_path_nondef, source_name)
     if not df.empty:  # Check if the dataframe is empty
         #write_dataframe_to_csv(df, csv_file_path)
         print(df.fillna('NULL').to_string(index=False))

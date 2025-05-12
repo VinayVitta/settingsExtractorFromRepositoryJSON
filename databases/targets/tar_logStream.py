@@ -6,7 +6,7 @@ import json
 
 
 
-def extract_null_settings(json_data, target_ep_name):
+def extract_logstream_settings(json_data, target_ep_name):
 
     databases = json_data.get('cmd.replication_definition', {}).get('databases', [])
     data = []
@@ -14,19 +14,21 @@ def extract_null_settings(json_data, target_ep_name):
 
     for database in databases:
         # print(database['name'])
-        if database['name'] == target_ep_name and database['type_id'] in ['NULL_TARGET_COMPONENT_TYPE']:
+        if database['name'] == target_ep_name and database['type_id'] in ['LOG_STREAM_COMPONENT_TYPE']:
             db_settings = database.get('db_settings', {})
 
             row_data = {
                 'target_endpoint_name': database.get('name'),
                 'target_db_type': database.get('type_id'),
+                'logStream_path': db_settings.get('path'),
+                'logStream_retention': db_settings.get('retentionmaxagehours'),
             }
             data.append(row_data)
             column_names = list(row_data.keys())
             break
 
     return data, column_names
-def extract_null_data_to_dataframe(json_file, target_name):
+def extract_logstream_data_to_dataframe(json_file, target_name):
     """
     Reads a JSON file, extracts relevant Snowflake data, and returns a Pandas DataFrame.
 
@@ -41,7 +43,7 @@ def extract_null_data_to_dataframe(json_file, target_name):
     try:
         with open(json_file, 'r') as f:
             json_data = json.load(f)
-        data, column_names = extract_null_settings(json_data, target_name)
+        data, column_names = extract_logstream_settings(json_data, target_name)
         if data:
             return pd.DataFrame(data, columns=column_names)
         else:
@@ -74,9 +76,9 @@ def main():
     """
     json_file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\tlpreplcdc-004.json"
     csv_file_path = r"C:\Users\VIT\Downloads\snowflake_settings.csv"
-    target_name = 'NULL_Target' #chnage source name
+    target_name = 'prod038_LogStream' #chnage source name
 
-    null_df = extract_null_data_to_dataframe(json_file_path, target_name)
+    null_df = extract_logstream_data_to_dataframe(json_file_path, target_name)
     print('aaaa')
     if not null_df.empty:
         # write_dataframe_to_csv(df, csv_file_path)

@@ -42,7 +42,7 @@ def extract_task_settings(json_data, target_task_name):
         'cdc_store_recovery_in_target', 'pk_changes_handle_delete_insert',
         'use_merge_for_batch', 'error_policy_apply_conflicts', 'delete_policy',
         'insert_policy', 'update_policy', 'escalation_policy', 'stream_buffers_number', 'stream_buffer_size',
-        'target_ep_name', 'target_db_type'
+        'target_ep_name'
     ]
 
     for task in tasks:
@@ -176,7 +176,7 @@ def extract_task_settings(json_data, target_task_name):
                 task_data['stream_buffers_number'] = common_settings.get('stream_buffers_number', 'default')
                 task_data['stream_buffer_size'] = common_settings.get('stream_buffer_size', 'default')
                 task_data['target_ep_name'] = task.get('targets', [{}])[0].get('rep_target', {}).get('target_name')
-                task_data['target_db_type'] = task.get('targets', [{}])[0].get('rep_target', {}).get('target_type')
+
 
             elif task_type == 'logstream':
                 common_settings = task_settings.get('common_settings', {})

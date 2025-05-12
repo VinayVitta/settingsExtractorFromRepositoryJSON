@@ -46,10 +46,7 @@ def extract_sql_server_settings(json_data, source_ep_name):
             data.append(row_data)
 
             # Define column names *only* when data is found and processed
-            column_names = ['source_server', 'source_endpoint_name', 'source_db_type', 'source_db_role', 'source_db_user',
-                            'source_logstreamstagingtask', 'sql_useWindowsAuthentication', 'sql_safeguardPolicy', 'sql_AlwaysOnShared',
-                            'sql_suspend_compute', 'sql_db', 'sql_heartbeatActivate'
-                            ]
+            column_names = list(row_data.keys())
             break  # important:  Exit the loop after finding the matching database
     return data, column_names  # Return the data and column names
 

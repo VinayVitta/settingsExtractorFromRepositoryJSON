@@ -44,14 +44,10 @@ def extract_snowflake_settings(json_data, target_ep_name):
                 'target_blobstoragecontainer': db_settings.get('blobstoragecontainer'),
                 'target_blobstoragefolder': db_settings.get('blobstoragefolder'),
                 'target_safeguardPolicy': db_settings.get('target_safeguardPolicy'),
+                'target_db_type': database.get('type_id'),
             }
             data.append(row_data)
-            column_names = ['target_endpoint_name', 'target_additional_properties', 'target_username',
-                            'target_server', 'target_database', 'target_maxFileSize', 'target_updateOneRow',
-                            'target_loadTimeout', 'target_afterConnectScript', 'target_executeTimeout',
-                            'target_warehouse', 'target_stagingtype', 'target_maxparalleltransfers',
-                            'target_parallelPut', 'target_blobstorageaccountname', 'target_blobstoragecontainer',
-                            'target_blobstoragefolder', 'target_safeguardPolicy']
+            column_names = list(row_data.keys())
             break
 
     return data, column_names

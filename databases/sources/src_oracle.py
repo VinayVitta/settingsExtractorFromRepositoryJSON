@@ -64,12 +64,7 @@ def extract_oracle_settings(json_data, source_ep_name):
             data.append(row_data)
 
             # Define column names *only* when data is found and processed
-            column_names = ['source_server', 'orc_source_service', 'useLogminerReader', 'asm_server', 'asm_user',
-                            'useBfile', 'addSupplementalLogging', 'accessAlternateDirectly', 'readAheadBlocks',
-                            'archivedLogDestId', 'securityDbEncryption', 'additionalArchivedLogDestId', 'useZeroDestid',
-                            'asmUsePLSQLArray', 'skipValidationLongNames', 'parallelASMReadThreads',
-                            'source_endpoint_name', 'source_db_type', 'source_db_role', 'source_db_user', 'source_logstreamstagingtask'
-                            ]
+            column_names = list(row_data.keys())
             break  # important:  Exit the loop after finding the matching database
     return data, column_names  # Return the data and column names
 
