@@ -109,7 +109,14 @@ def extract_all_settings(json_file_path):
         df for df in all_dataframes
         if not df.empty and not df.isna().all(axis=1).all()
     ]
-    return pd.concat(non_empty_rows, ignore_index=True) if non_empty_rows else pd.DataFrame()
+    if non_empty_rows:
+        result = pd.concat(non_empty_rows, ignore_index=True)
+        # turn all real NaN/None into the string 'NULL'
+        #return result.fillna('NULL')
+        # return pd.concat(result.fillna('NULL'), ignore_index=True) if non_empty_rows else pd.DataFrame()
+        return result.fillna('NULL')
+    else:
+        return pd.DataFrame()
 
 
 if __name__ == "__main__":
