@@ -29,10 +29,10 @@ def extract_postgres_settings(json_data, source_ep_name):
                 'source_db_role': database.get('role'),
                 'source_db_user': db_settings.get('username', 'default'),
                 'source_server': db_settings.get('server', 'default'),
-                'pg_database': db_settings.get('database', 'default'),
-                'pg_captureDDLs': db_settings.get('captureDDLs', False),
-                'pg_heartbeatEnable': db_settings.get('heartbeatEnable', False),
-                'pg_heartbeatSchema': db_settings.get('heartbeatSchema', 'default')
+                'src_postgres_database': db_settings.get('database', 'default'),
+                'src_postgres_captureDDLs': db_settings.get('captureDDLs', False),
+                'src_postgres_heartbeatEnable': db_settings.get('heartbeatEnable', False),
+                'src_postgres_heartbeatSchema': db_settings.get('heartbeatSchema', 'default')
             }
 
             data.append(row_data)

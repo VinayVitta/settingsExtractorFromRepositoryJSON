@@ -20,6 +20,7 @@ def extract_null_settings(json_data, target_ep_name):
             row_data = {
                 'target_endpoint_name': database.get('name'),
                 'target_db_type': database.get('type_id'),
+                'target_server': "Null_Target"
             }
             data.append(row_data)
             column_names = list(row_data.keys())

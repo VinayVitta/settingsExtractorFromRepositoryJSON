@@ -2,7 +2,7 @@ import json
 import os
 import re
 import sys
-
+import csv
 import pandas as pd
 
 
@@ -63,8 +63,48 @@ def load_and_prefix_columns(file_path, prefix="qem_"):
     return df
 
 
+def clean_multiline_tsv(input_file_path, output_file_path=None):
+    """
+    Cleans a TSV file with multiline quoted fields by reading full content and re-parsing.
+
+    Args:
+        input_file_path (str): Path to the source TSV file.
+        output_file_path (str, optional): Destination path for cleaned file. If not provided,
+                                          '_cleaned' is appended to the input filename.
+
+    Returns:
+        str: Path to cleaned output file.
+    """
+    if not output_file_path:
+        base, ext = os.path.splitext(input_file_path)
+        output_file_path = f"{base}_cleaned{ext}"
+
+    # Read full content so quoted newlines are preserved
+    with open(input_file_path, 'r', encoding='utf-8') as infile:
+        content = infile.read()
+
+    # Parse with csv.reader handling quotes and tabs
+    rows = list(csv.reader(content.splitlines(), delimiter='\t', quotechar='"'))
+
+    # Filter out any empty rows if needed
+    cleaned_rows = [row for row in rows if any(cell.strip() for cell in row)]
+
+    # Write cleaned rows
+    with open(output_file_path, 'w', encoding='utf-8', newline='') as outfile:
+        writer = csv.writer(outfile, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerows(cleaned_rows)
+
+    print(f"✅ Cleaned TSV written to: {output_file_path}")
+    return output_file_path
+
+
+
 # Example usage
 file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\AemTasks_2025-04-25_13.35.53.8.tsv"
-df = load_and_prefix_columns(file_path, prefix="qem_")
+#df = load_and_prefix_columns(file_path, prefix="qem_")
 
-print(df.head())  # Display first few rows
+#print(df.head())  # Display first few rows
+
+#input_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\Ally\HealthCheck\AemTasks_2025-05-14_15.16.58.954.tsv"
+#cleaned_path = clean_multiline_tsv(input_path)
+

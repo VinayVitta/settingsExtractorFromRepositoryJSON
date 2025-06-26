@@ -39,17 +39,17 @@ def extract_mongodb_settings(json_data, source_ep_name):
                 'source_db_type': database.get('type_id'),
                 'source_db_role': database.get('role'),
                 'source_logstreamstagingtask': db_settings.get('logstreamstagingtask', 'None'),
-                'source_database': conn_info.get("dbName", ""),
-                "auth_method": conn_info.get("auth", ""),
-                "IAM_credential_source": conn_info.get("iAMcred", ""),
-                "username": conn_info.get("username", ""),
-                "use_ssl": conn_info.get("useSsl", False),
-                "json_mode": conn_info.get("jsonMode", ""),
-                "polling_interval": conn_info.get("pollingInterval", ""),
-                "polling_interval_on_start": conn_info.get("pollingIntervalOnStart", ""),
-                "generated_id": conn_info.get("generatedId", ""),
-                "id_size": conn_info.get("idSize", ""),
-                "additional_options": conn_info.get("options", "")
+                'src_mongo_database': conn_info.get("dbName", ""),
+                "src_mongo_auth_method": conn_info.get("auth", ""),
+                "src_mongo_IAM_credential_source": conn_info.get("iAMcred", ""),
+                "src_mongo_username": conn_info.get("username", ""),
+                "src_mongo_use_ssl": conn_info.get("useSsl", False),
+                "src_mongo_json_mode": conn_info.get("jsonMode", ""),
+                "src_mongo_polling_interval": conn_info.get("pollingInterval", ""),
+                "src_mongo_polling_interval_on_start": conn_info.get("pollingIntervalOnStart", ""),
+                "src_mongo_generated_id": conn_info.get("generatedId", ""),
+                "src_mongo_id_size": conn_info.get("idSize", ""),
+                "src_mongo_additional_options": conn_info.get("options", "")
             }
             data.append(row_data)
 

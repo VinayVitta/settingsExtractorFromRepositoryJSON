@@ -1,9 +1,10 @@
-duplicate_replication_multiple_targets =  """
+duplicate_replication_multiple_targets_with_diff_replicate_server =  """
 WITH DuplicateEntries AS (
     SELECT 
-        "table_name" AS table_name,
-        "schema_name" AS schema_name,
-        "source_server" AS source_server,
+        "table_name",
+        "schema_name",
+        "source_server",
+        COUNT(DISTINCT "replicate_server") AS ReplicateServerCount,
         COUNT(*) AS DuplicateCount
     FROM data_df
     WHERE 
@@ -19,28 +20,14 @@ WITH DuplicateEntries AS (
         schema_name,
         source_server
     HAVING 
-        COUNT(*) > 1
+        COUNT(*) > 1 AND COUNT(DISTINCT "replicate_server") > 1
 )
 
 SELECT 
-    md."task_name",
+    md."replicate_server",
     md."table_name",
-    md."schema_name",
-    md."source_server",
-    md."target_db_type",
-    md."target_server",
-    md."apply_changes",
-    md."store_changes",
-    md."qem_State",
-    de.DuplicateCount,
-    COUNT(*) OVER (
-        PARTITION BY 
-            md."table_name", 
-            md."schema_name", 
-            md."source_server", 
-            md."target_db_type", 
-            md."target_server"
-    ) AS TotalOccurrences
+    md."task_name",
+    de.DuplicateCount
 FROM data_df md
 JOIN DuplicateEntries de ON 
     md."table_name" = de.table_name AND 
@@ -54,7 +41,8 @@ WHERE
         LOWER(COALESCE(md."store_changes", '')) LIKE '%enable%'
     )
     AND LOWER(md."qem_State") = 'running'
-ORDER BY md."table_name";
+ORDER BY md."table_name", md."replicate_server", md."task_name";
+
 """
 
 duplicate_replication_same_targets =  """
@@ -86,16 +74,9 @@ WITH DuplicateEntries AS (
 )
 
 SELECT 
+    md."replicate_server",
     md."task_name",
     md."table_name",
-    md."schema_name",
-    md."source_server",
-    md."target_db_type",
-    md."target_server",
-    md."apply_changes",
-    md."store_changes",
-    md."qem_State",
-    de.DuplicateCount,
     COUNT(*) OVER (
         PARTITION BY 
             md."table_name", 

@@ -1,6 +1,7 @@
 import pandas as pd
 import json,re
 
+
 def extract_tables(json_data):
     """
     Extracts SAP-related source table configuration from a JSON replication definition.
@@ -33,7 +34,12 @@ def extract_tables(json_data):
         }
 
         # Tables
-        table_list = task.get('source', {}).get('source_tables', {}).get('explicit_included_tables', [])
+        # table_list = task.get('source', {}).get('source_tables', {}).get('explicit_included_tables', []) # This will NOT include patterns
+        # Tables
+        source_tables = task.get('source', {}).get('source_tables', {})
+        explicit_tables = source_tables.get('explicit_included_tables', [])
+        pattern_tables = source_tables.get('included_pattern', [])
+        table_list = explicit_tables + pattern_tables  # Combine both
         if not table_list:
             print(f"No tables found for task: {tables_task_name}")
             continue
@@ -86,13 +92,13 @@ def main():
     """
     Main function to orchestrate the data extraction and CSV writing process.
     """
-    json_file_path = r"C:\Users\VIT\Downloads\Replication_Definition_ketan.json"
-    csv_file_path = r"C:\Users\VIT\Downloads\sql_server_settings.csv"
+    json_file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\tlpreplcdc-004.json"
+    csv_file_path = r"C:\Users\VIT\Downloads\test_out_1.csv"
 
     df = extract_tables_dataframe(json_file_path)
     if not df.empty:
         # Uncomment to write to CSV
-        # write_dataframe_to_csv(df, csv_file_path)
+        write_dataframe_to_csv(df, csv_file_path)
         print(df.fillna('NULL').to_string(index=False))
     else:
         print("No data to write to CSV.")

@@ -2,10 +2,12 @@ import os
 import json
 import re
 import pandas as pd
-import logging
+from helpers.logger_config import setup_logger
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+logging = setup_logger(__name__)
 
 
 def extract_task_settings(json_data, target_task_name):
@@ -32,7 +34,8 @@ def extract_task_settings(json_data, target_task_name):
         'header_columns_change_oper', 'header_columns_change_mask',
         'header_columns_change_stream', 'header_columns_change_operation',
         'header_columns_change_tran_id', 'header_columns_change_timestamp',
-        'statements_cache_size', 'cdc_batch_apply', 'cdc_batch_min',
+        'statements_cache_size', 'cdc_apply_method', 'min_transaction_size_tran_apply',
+        'commit_timeout_tran_apply', 'cdc_batch_min',
         'cdc_batch_max', 'cdc_batch_memory_limit', 'cdc_bulk_parallel_apply',
         'cdc_bulk_parallel_apply_threads', 'cdc_transaction_memory',
         'cdc_transaction_keep_time', 'cdc_statement_cache',
@@ -97,10 +100,12 @@ def extract_task_settings(json_data, target_task_name):
                 'cdc_when_source_ddl': target_set.get('handle_column_ddl', 'True'),
                 'store_changes': 'Enable' if common.get('save_changes_enabled') else 'Disable',
                 'statements_cache_size': target_set.get('statements_cache_size', 50),
-                'cdc_batch_apply': 'disable' if common.get('batch_apply_enabled') else 'enable',
-                'cdc_batch_min': common.get('batch_apply_timeout_min', 1),
-                'cdc_batch_max': common.get('batch_apply_timeout', 30),
-                'cdc_batch_memory_limit': common.get('batch_apply_memory_limit', 500),
+                'cdc_apply_method': 'transaction_apply' if common.get('batch_apply_enabled') else 'batch_apply',
+                'min_transaction_size_tran_apply': target_set.get('min_transaction_size', 1000) if common.get('batch_apply_enabled') else 'NA',
+                'commit_timeout_tran_apply': target_set.get('commit_timeout', 1000) if common.get('batch_apply_enabled') else 'NA',
+                'cdc_batch_min': common.get('batch_apply_timeout_min', 1) if not common.get('batch_apply_enabled') else 'NA',
+                'cdc_batch_max': common.get('batch_apply_timeout', 30) if not common.get('batch_apply_enabled') else 'NA',
+                'cdc_batch_memory_limit': common.get('batch_apply_memory_limit', 500) if not common.get('batch_apply_enabled') else 'NA',
                 'cdc_bulk_parallel_apply': 'enable' if common.get('batch_apply_use_parallel_bulk') else 'disable',
                 'cdc_bulk_parallel_apply_threads': common.get('parallel_bulk_max_num_threads', 'NULL'),
                 'cdc_transaction_memory': sorter.get('local_transactions_storage', {}).get('memory_limit_total', 1024),
@@ -157,7 +162,10 @@ def extract_task_settings(json_data, target_task_name):
                 'stream_buffer_size': common.get('stream_buffer_size', 'default'),
                 'full_load': 'LogStream_Task',
                 'target_ep_name': target.get('target_name'),
-                'target_db_type': 'LOG_STREAM_COMPONENT_TYPE'
+                'target_db_type': 'LOG_STREAM_COMPONENT_TYPE',
+                'cdc_apply_method': 'transaction_apply' if not common.get('batch_apply_enabled') else 'batch_apply',
+                'min_transaction_size_tran_apply': sorter.get('memory_limit_total', 1000),
+                'commit_timeout_tran_apply':  sorter.get('memory_keep_time', 60),
             })
 
         data.append(task_data)
@@ -195,7 +203,7 @@ def main():
 
     df = extract_data_to_dataframe(json_file_path, target_task_name)
     if not df.empty:
-        # write_dataframe_to_csv(df, csv_file_path)
+        write_dataframe_to_csv(df, csv_file_path)
         print(df)
     else:
         logging.warning(f"No data extracted for task: {target_task_name}")

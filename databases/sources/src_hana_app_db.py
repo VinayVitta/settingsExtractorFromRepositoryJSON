@@ -20,7 +20,7 @@ def extract_sap_hana_settings(json_data, source_ep_name):
     column_names = []
 
     for database in databases:
-        if database['name'] == source_ep_name and database['type_id'] in ['SAP_APPLICATION_COMPONENT_TYPE', 'SAP_HANA_SRC_COMPONENT_TYPE']:
+        if database['name'] == source_ep_name and database['type_id'] in ['SAP_APPLICATION_COMPONENT_TYPE', 'SAP_HANA_SRC_COMPONENT_TYPE', 'SAPDB_COMPONENT_TYPE']:
             db_settings = database.get('db_settings', {})
             row_data = {
                 'source_endpoint_name': database.get('name'),
@@ -29,18 +29,18 @@ def extract_sap_hana_settings(json_data, source_ep_name):
                 'source_db_user': db_settings.get('username'),
                 'source_server': db_settings.get('server'),
                 'source_client': db_settings.get('client'),
-                'source_backend_db': db_settings.get('backend_db'),
-                'source_instance_number': db_settings.get('instance_number'),
-                'source_cleanup_interval': db_settings.get('cleanup_interval'),
-                'source_log_retention_period': db_settings.get('log_retention_period'),
-                'source_logTableTriggerBasedMode': db_settings.get('logTableTriggerBasedMode'),
                 'source_logstreamstagingtask': db_settings.get('logstreamstagingtask'),
-                'source_rfc_call_batch': db_settings.get('rfc_call_batch'),
-                'source_connection_type': db_settings.get('connection_type'),
-                'source_server_group': db_settings.get('server_group'),
-                'source_message_server_service': db_settings.get('message_server_service'),
-                'source_r3_system': db_settings.get('r3_system'),
-                'source_store_only_tdline_in_stxtl_clustd': db_settings.get('store_only_tdline_in_stxtl_clustd')
+                'src_hana_backend_db': db_settings.get('backend_db'),
+                'src_hana_instance_number': db_settings.get('instance_number'),
+                'src_hana_cleanup_interval': db_settings.get('cleanup_interval'),
+                'src_hana_log_retention_period': db_settings.get('log_retention_period'),
+                'src_hana_logTableTriggerBasedMode': db_settings.get('logTableTriggerBasedModrc_hana'),
+                'src_hana_rfc_call_batch': db_settings.get('rfc_call_batch'),
+                'src_hana_connection_type': db_settings.get('connection_type'),
+                'src_hana_server_group': db_settings.get('server_group'),
+                'src_hana_message_server_service': db_settings.get('message_server_service'),
+                'src_hana_r3_system': db_settings.get('r3_system'),
+                'src_hana_store_only_tdline_in_stxtl_clustd': db_settings.get('store_only_tdline_in_stxtl_clustd')
             }
 
             # Handle backend DB lookup

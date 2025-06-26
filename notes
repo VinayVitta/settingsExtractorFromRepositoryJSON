@@ -1,2 +1,6 @@
 retrieveTaskSettings.py line number 30 export to DF
 Use cases top identify each endpoint type and run that
+
+Exclusions:
+
+1. Not Handing table patters as table list is not present in JSON

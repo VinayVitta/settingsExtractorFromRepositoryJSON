@@ -2,11 +2,11 @@ import pandas as pd
 import duckdb
 from helpers.queries import tasksCounts, changeProcessTuning, handlingPolicy, logStream, tablesData
 import os
-import logging
+from helpers.logger_config import setup_logger
 from helpers.docx.docCreation import export_tables_to_word
 
 # Configure Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging = setup_logger(__name__)
 
 
 def read_csv(path):
@@ -23,10 +23,10 @@ def run_queries(query_list):
     return pd.concat([duckdb.query(q).to_df() for q in query_list], ignore_index=True)
 
 
-def main():
+def create_summary(csv_result_file_path, output_docx_path):
     # Config
-    csv_file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\run_output_20250507_094558\exportRepositoryCSV_20250507_094558.csv"
-    output_docx_path = "full_task_summary.docx"
+    csv_file_path = csv_result_file_path
+    output_docx_path = output_docx_path
 
     # Load data
     data_df = read_csv(csv_file_path)
@@ -79,9 +79,13 @@ def main():
             "queries": [logStream.totalChildTasksForEachParent],
             "notes": "Shows the number of child tasks under each log stream."
         },
-        "Replication of same Table to Multiple Targets": {
-            "queries": [tablesData.duplicate_replication_multiple_targets],
-            "notes": "Lists of Tables replicate more than once to same or more target DB's."
+        "Multiple LogStream Connecting to Same Source Server": {
+            "queries": [logStream.multipleLogStreamSameSourceDB],
+            "notes": "Shows the number of LogStream tasks connecting to same source database."
+        },
+        "Replication of the same Table to Multiple Targets with different Replicate servers": {
+            "queries": [tablesData.duplicate_replication_multiple_targets_with_diff_replicate_server],
+            "notes": "Lists of Tables replicate more than once to the same or more target Databases and are hosted on different Replicate servers."
         },
         "Replication of same Table to Same Targets": {
             "queries": [tablesData.duplicate_replication_same_targets],
@@ -94,7 +98,7 @@ def main():
     for title, content in queries.items():
         logging.info(f"Running: {title}")
         df = run_queries(content["queries"])
-        print(f"\n{title}:\n", df.to_string(index=False))  # Optional CLI output
+        # print(f"\n{title}:\n", df.to_string(index=False))  # Optional CLI output
 
         summary_tables.append({
             "title": title,
@@ -103,9 +107,14 @@ def main():
         })
 
     # Export to Word
-    # export_tables_to_word(summary_tables, output_docx_path, title="QLik Replicate - Task Summary",logo_path=r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\UDocs\Qlik New Logo.png")
-    # print(summary_tables)
+    export_tables_to_word(summary_tables, output_docx_path, title="QLik Replicate - Task Summary",logo_path=r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\UDocs\Qlik New Logo.png")
+    print(summary_tables)
 
+
+def main():
+    csv_file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\run_output_20250528_111756\exportRepositoryCSV_20250528_111756.csv"
+    output_docx_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\run_output_20250528_111756\full_task_summary.docx"
+    create_summary(csv_file_path, output_docx_path)
 
 if __name__ == "__main__":
     main()

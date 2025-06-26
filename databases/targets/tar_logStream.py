@@ -21,7 +21,9 @@ def extract_logstream_settings(json_data, target_ep_name):
                 'target_endpoint_name': database.get('name'),
                 'target_db_type': database.get('type_id'),
                 'logStream_path': db_settings.get('path'),
-                'logStream_retention': db_settings.get('retentionmaxagehours'),
+                'target_server': "LogStream_Connection",
+                'logStream_retention_time': db_settings.get('retentionmaxagehours'),
+                'logStream_retention_size_MB': db_settings.get('retentionmaxsizemb')
             }
             data.append(row_data)
             column_names = list(row_data.keys())

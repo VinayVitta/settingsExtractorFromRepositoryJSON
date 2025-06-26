@@ -23,3 +23,31 @@ LEFT JOIN unique_running_replications AS ur
 GROUP BY ul.logstream_task_name
 ORDER BY RunningReplicationTaskCount DESC;
 """
+
+multipleLogStreamSameSourceDB = """
+WITH logstream_tasks AS (
+    SELECT DISTINCT
+        TRIM(task_name) AS task_name,
+        TRIM(source_server) AS source_server,
+        TRIM(replicate_server) AS replicate_server
+    FROM data_df
+    WHERE LOWER(task_type) = 'logstream'
+),
+source_server_counts AS (
+    SELECT 
+        source_server
+    FROM logstream_tasks
+    GROUP BY source_server
+    HAVING COUNT(*) > 1
+)
+
+SELECT 
+    lt.task_name AS TaskName,
+    lt.replicate_server AS ReplicateServer,
+    lt.source_server AS SourceServer
+FROM logstream_tasks AS lt
+JOIN source_server_counts AS ssc
+    ON lt.source_server = ssc.source_server
+ORDER BY lt.source_server, lt.task_name;
+
+"""

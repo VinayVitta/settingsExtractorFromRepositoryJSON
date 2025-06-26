@@ -94,9 +94,10 @@ def export_tables_to_word(summary_tables, filename="task_summary.docx", title="T
             empty_run = empty_para.runs[0]
             empty_run.font.name = 'Inter'
             empty_run.font.size = Pt(10.5)
-            empty_run.font.color.rgb = RGBColor(0x55, 0x5F, 0x68)
+            empty_run.font.color.rgb = RGBColor(0x55, 0x5F, 0x68)  # Qlik Gray
             continue
 
+        df.insert(0, 'S.No', range(1, len(df) + 1))
         table = doc.add_table(rows=1, cols=len(df.columns))
         table.style = 'Light Grid'
 
@@ -115,7 +116,7 @@ def export_tables_to_word(summary_tables, filename="task_summary.docx", title="T
                 run = row_cells[i].paragraphs[0].add_run(str(row[col]))
                 run.font.name = 'Inter'
                 run.font.size = Pt(10.5)
-                run.font.color.rgb = RGBColor(0x55, 0x5F, 0x68)  # Qlik Gray
+                run.font.color.rgb = RGBColor(0x55, 0x5F, 0x68)  # Black
 
         doc.add_paragraph()
 

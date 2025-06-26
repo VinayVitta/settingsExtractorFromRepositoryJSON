@@ -36,12 +36,12 @@ def extract_sql_server_settings(json_data, source_ep_name):
                 'source_db_role': database.get('role'),
                 'source_db_user': db_settings.get('username', 'default-winauth'),
                 'source_logstreamstagingtask': db_settings.get('logstreamstagingtask', 'None'),
-                'sql_useWindowsAuthentication': db_settings.get('useWindowsAuthentication', 'true'),
-                'sql_safeguardPolicy': db_settings.get('safeguardPolicy', 'default'),
-                'sql_AlwaysOnShared': db_settings.get('AlwaysOnSharedSynchedBackupIsEnabled', 'default'),
-                'sql_suspend_compute': db_settings.get('suspendTableWithComputedColumn', 'default'),
-                'sql_db': db_settings.get('database', 'default'),
-                'sql_heartbeatActivate': db_settings.get('heartbeatActivate', 'default')
+                'src_sql_useWindowsAuthentication': db_settings.get('useWindowsAuthentication', 'true'),
+                'src_sql_safeguardPolicy': db_settings.get('safeguardPolicy', 'default'),
+                'src_sql_AlwaysOnShared': db_settings.get('AlwaysOnSharedSynchedBackupIsEnabled', 'default'),
+                'src_sql_suspend_compute': db_settings.get('suspendTableWithComputedColumn', 'default'),
+                'src_sql_db': db_settings.get('database', 'default'),
+                'src_sql_heartbeatActivate': db_settings.get('heartbeatActivate', 'default')
             }
             data.append(row_data)
 

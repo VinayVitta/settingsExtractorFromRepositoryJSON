@@ -1,7 +1,7 @@
 # Tasks DDL handling
 ddl_handling = """
 SELECT 
-    'DDL Handling' AS Description,
+    --'DDL Handling' AS Description,
     CAST(target_db_type AS VARCHAR) AS target_db_type,
     CAST(cdc_when_source_table_dropped AS VARCHAR) AS cdc_when_source_table_dropped,
     CAST(cdc_when_source_truncate AS VARCHAR) AS cdc_when_source_truncate,
@@ -23,7 +23,7 @@ GROUP BY
 # Task policy global or task
 handling_policy = """
 SELECT 
-    'Server/Task Policy' AS Description,
+    --'Server/Task Policy' AS Description,
     CAST(target_db_type AS VARCHAR) AS target_db_type,
     CAST(error_policy_apply_conflicts AS VARCHAR) AS error_policy_apply_conflicts,
     COUNT(DISTINCT task_name) AS DistinctTaskCount,
@@ -38,7 +38,7 @@ GROUP BY
 
 error_handling = """
 SELECT 
-    'Error Handling' AS Description,
+    --'Error Handling' AS Description,
     CAST(target_db_type AS VARCHAR) AS target_db_type,
     CAST(delete_policy AS VARCHAR) AS delete_policy,
     CAST(insert_policy AS VARCHAR) AS insert_policy,

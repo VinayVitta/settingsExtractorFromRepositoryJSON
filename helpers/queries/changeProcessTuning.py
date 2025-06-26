@@ -1,7 +1,7 @@
 
 batch_tuning = """
 SELECT 
-    'Batch Tuning' AS Description,
+   -- 'Batch Tuning' AS Description,
     CAST(cdc_batch_min AS INTEGER) AS MinBatchTime,
     CAST(cdc_batch_max AS INTEGER) AS MaxBatchTime,
     CAST(cdc_batch_memory_limit AS INTEGER) AS BatchMemory,
@@ -18,7 +18,7 @@ GROUP BY
 
 transaction_memory = """
 SELECT 
-    'Transaction mem offloading' AS Description,
+    --'Transaction mem offloading' AS Description,
     CAST(cdc_transaction_memory AS INTEGER) AS CDCTransactionMemory,
     CAST(cdc_transaction_keep_time AS INTEGER) AS CDCTransactionKeepTime,
     COUNT(DISTINCT task_name) AS DistinctTaskCount,
@@ -33,7 +33,7 @@ GROUP BY
 
 control_tables = """
 SELECT 
-    'Control Tables' AS Description,
+    --'Control Tables' AS Description,
     CAST(attrep_history_table AS VARCHAR) AS attrep_history_table,
     CAST(attrep_status_table AS VARCHAR) AS attrep_status_table,
     CAST(attrep_suspended_table AS VARCHAR) AS attrep_suspended_table,
@@ -52,7 +52,7 @@ GROUP BY
 
 lob_size = """
 SELECT 
-    'LOB' AS Description,
+    --'LOB' AS Description,
     CAST(lob_max_size AS INTEGER) AS lob_max_size,
     CAST(target_db_type AS VARCHAR) AS target_db_type,
     COUNT(DISTINCT task_name) AS DistinctTaskCount,
