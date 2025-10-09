@@ -95,7 +95,7 @@ settingsExtractorFromRepositoryJSON/
 │   └── public/
 │
 ├── helpers/                       # Your existing helpers
-├── databases/                     # Your existing database extractors
+├── databases/                     # Your existing database extractors .
 └── README.md
 
 ```
