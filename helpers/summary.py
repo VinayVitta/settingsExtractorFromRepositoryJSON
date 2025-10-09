@@ -91,6 +91,11 @@ def create_summary(csv_result_file_path, output_docx_path):
             "queries": [tablesData.duplicate_replication_same_targets],
             "notes": "Lists of Tables replicate more than once to same target DB's."
         },
+        "LogStream tasks with NO Child/Replication tasks": {
+            "queries": [logStream.losgtreamwithNoChild],
+            "notes": "Lists of all Running LogStream tasks with NO Child/Replicate tasks"
+        },
+
     }
 
     # Run queries and collect summaries
@@ -108,11 +113,11 @@ def create_summary(csv_result_file_path, output_docx_path):
 
     # Export to Word
     export_tables_to_word(summary_tables, output_docx_path, title="QLik Replicate - Task Summary",logo_path=r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\UDocs\Qlik New Logo.png")
-    print(summary_tables)
+    #print(summary_tables)
 
 
 def main():
-    csv_file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\run_output_20250528_111756\exportRepositoryCSV_20250528_111756.csv"
+    csv_file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\Ally\HealthCheck\LatestFIles\run_output_20250626_172717\exportRepositoryCSV_20250626_172717.csv"
     output_docx_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\run_output_20250528_111756\full_task_summary.docx"
     create_summary(csv_file_path, output_docx_path)
 

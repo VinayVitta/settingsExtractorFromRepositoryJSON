@@ -1,0 +1,14 @@
+server_settings = """
+SELECT replicate_server
+,enable_auto_roll_over_logs
+,roll_over_max_age_days_logs
+,roll_over_max_size_mb_logs
+,disk_utilization_configuration
+,high_disk_storage_percent
+,critical_disk_storage_percent
+,memory_utilization_configuration
+,high_memory_storage_percent
+,critical_memory_storage_percent
+,replicate_version 
+FROM data_df
+"""

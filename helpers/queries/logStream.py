@@ -5,6 +5,7 @@ WITH unique_logstreams AS (
     SELECT DISTINCT TRIM(task_name) AS logstream_task_name
     FROM data_df
     WHERE LOWER(task_type) = 'logstream'
+    AND LOWER(qem_State) = 'running'
 ),
 unique_running_replications AS (
     SELECT DISTINCT TRIM(task_name) AS replication_task_name,
@@ -32,6 +33,7 @@ WITH logstream_tasks AS (
         TRIM(replicate_server) AS replicate_server
     FROM data_df
     WHERE LOWER(task_type) = 'logstream'
+    AND LOWER(qem_State) = 'running'
 ),
 source_server_counts AS (
     SELECT 
@@ -50,4 +52,28 @@ JOIN source_server_counts AS ssc
     ON lt.source_server = ssc.source_server
 ORDER BY lt.source_server, lt.task_name;
 
+"""
+
+losgtreamwithNoChild =  """
+WITH unique_logstreams AS (
+    SELECT DISTINCT TRIM(task_name) AS logstream_task_name
+    FROM data_df
+    WHERE LOWER(task_type) = 'logstream'
+      AND LOWER(qem_State) = 'running'
+),
+unique_running_replications AS (
+    SELECT DISTINCT TRIM(source_logstreamstagingtask) AS parent_logstream
+    FROM data_df
+    WHERE LOWER(task_type) = 'replication'
+      AND LOWER(qem_State) = 'running'
+)
+
+-- Select LogStreams that are NOT used as a parent
+SELECT logstream_task_name
+FROM unique_logstreams
+WHERE logstream_task_name NOT IN (
+    SELECT parent_logstream
+    FROM unique_running_replications
+    WHERE parent_logstream IS NOT NULL
+);
 """

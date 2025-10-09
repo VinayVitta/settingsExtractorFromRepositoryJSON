@@ -10,7 +10,7 @@ from helpers.logger_config import setup_logger
 logging = setup_logger(__name__)
 
 
-def extract_task_settings(json_data, target_task_name):
+def extract_task_settings(json_file_name,json_data, target_task_name):
     """
     Extracts task settings from a JSON data structure for a specific task name.
     Returns a tuple of (data, column_names) or empty lists if not found.
@@ -19,7 +19,7 @@ def extract_task_settings(json_data, target_task_name):
     data = []
 
     column_names = [
-        'replicate_server', 'task_name', 'task_type', 'source_name', 'target_names', 'lob_max_size',
+        'json_file_name', 'replicate_server', 'task_name', 'task_type', 'source_name', 'target_names', 'lob_max_size',
         'table_count', 'target_table_schema', 'replication_hist_timeslot',
         'attrep_exceptions_table', 'attrep_status_table', 'attrep_suspended_table',
         'attrep_history_table', 'full_load', 'full_load_drop_target_tables',
@@ -56,6 +56,7 @@ def extract_task_settings(json_data, target_task_name):
         if match:
             replicate_server = match.group(1)
 
+        task_data['json_file_name'] = json_file_name
         task_data['replicate_server'] = replicate_server
         task_data['task_name'] = task.get('task', {}).get('name')
         task_type = 'logstream' if '_LOG_STREAM' == task.get('task', {}).get('task_type') else 'replication'
@@ -86,7 +87,8 @@ def extract_task_settings(json_data, target_task_name):
                 'attrep_history_table': 'Enabled' if common.get('history_table_enabled') else 'Disabled',
                 'full_load': 'Disabled' if common.get('full_load_enabled') else 'Enabled',
                 'full_load_drop_target_tables': 'Disable' if target_set.get('artifacts_cleanup_enabled') else 'Enable',
-                'full_load_do_nothing': 'Enable' if target_set.get('drop_table_if_exists') and not target_set.get('truncate_table_if_exists') else 'Disable',
+                'full_load_do_nothing': 'Enable' if target_set.get('drop_table_if_exists') and not target_set.get(
+                    'truncate_table_if_exists') else 'Disable',
                 'full_load_truncate_target_tables': 'Enable' if target_set.get('truncate_table_if_exists') else 'Disable',
                 'create_pk_after_data_load': 'Enable' if target_set.get('create_pk_after_data_load') else 'Disable',
                 'stop_task_after_full_load': 'Enable' if common.get('stop_task_after_full_load') else 'Disable',
@@ -94,7 +96,7 @@ def extract_task_settings(json_data, target_task_name):
                 'max_full_load_tables': task_settings.get('full_load_sub_tasks', 5),
                 'transaction_consistency_timeout': sorter.get('transaction_consistency_timeout', 600),
                 'full_load_commit_rate': target_set.get('max_transaction_size', 10000),
-                'apply_changes': 'Disable' if common.get('apply_changes_enabled') else 'Enable',
+                'apply_changes': 'disable' if common.get('apply_changes_enabled') else 'enable',
                 'cdc_when_source_table_dropped': target_set.get('handle_drop_ddl', 'True'),
                 'cdc_when_source_truncate': target_set.get('handle_truncate_ddl', 'True'),
                 'cdc_when_source_ddl': target_set.get('handle_column_ddl', 'True'),
@@ -165,7 +167,7 @@ def extract_task_settings(json_data, target_task_name):
                 'target_db_type': 'LOG_STREAM_COMPONENT_TYPE',
                 'cdc_apply_method': 'transaction_apply' if not common.get('batch_apply_enabled') else 'batch_apply',
                 'min_transaction_size_tran_apply': sorter.get('memory_limit_total', 1000),
-                'commit_timeout_tran_apply':  sorter.get('memory_keep_time', 60),
+                'commit_timeout_tran_apply': sorter.get('memory_keep_time', 60),
             })
 
         data.append(task_data)

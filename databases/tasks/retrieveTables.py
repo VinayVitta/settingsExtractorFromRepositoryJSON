@@ -2,7 +2,7 @@ import pandas as pd
 import json,re
 
 
-def extract_tables(json_data):
+def extract_tables(json_file_name, json_data):
     """
     Extracts SAP-related source table configuration from a JSON replication definition.
 
@@ -20,12 +20,14 @@ def extract_tables(json_data):
         1) if replicate_json_hostname and re.search(r"Host name:\s([a-zA-Z0-9.-]+)",
                                                     replicate_json_hostname) else None
     for task in tasks:
+        tables_json_file_name = json_file_name
         tables_task_name = task.get('task', {}).get('name')
         tables_source_ep_name = task.get('source', {}).get('rep_source', {}).get('source_name')
         tables_target_ep_name = task.get('targets', [{}])[0].get('rep_target', {}).get('target_name')
         tables_task_type = 'logstream' if task.get('task', {}).get('task_type') == '_LOG_STREAM' else 'replication'
 
         row_base = {
+            'tables_json_file_name': json_file_name,
             'tables_replicate_server': tables_replicate_server,
             'tables_task_name': tables_task_name,
             'tables_task_type': tables_task_type,
@@ -53,7 +55,7 @@ def extract_tables(json_data):
     return pd.DataFrame(rows)
 
 
-def extract_tables_dataframe(json_file_path):
+def extract_tables_dataframe(json_file_name, json_file_path):
     """
     Reads a JSON file and extracts table data into a DataFrame.
 
@@ -67,7 +69,7 @@ def extract_tables_dataframe(json_file_path):
     try:
         with open(json_file_path, 'r') as f:
             json_content = json.load(f)
-        return extract_tables(json_content)
+        return extract_tables(json_file_name, json_content)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error: {e}")
         return pd.DataFrame()

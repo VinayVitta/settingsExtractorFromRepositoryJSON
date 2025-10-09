@@ -46,7 +46,7 @@ SELECT
     COUNT(DISTINCT task_name) AS DistinctTaskCount,
     COUNT(CAST(table_count AS INTEGER)) AS TotalTables
 FROM data_df
-WHERE (LOWER(apply_changes) = 'enable' AND LOWER(store_changes) LIKE '%disable%') AND
+WHERE (LOWER(apply_changes) = 'enable' AND LOWER(store_changes) LIKE 'disable') AND
 LOWER(qem_State) = 'running'
 """
 
