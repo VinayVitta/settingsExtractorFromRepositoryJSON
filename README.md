@@ -87,12 +87,20 @@ settingsExtractorFromRepositoryJSON/
 ├── frontend/                      # React frontend
 │   ├── package.json
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── FileUploader.jsx
-│   │   │   └── OutputDownloader.jsx
-│   │   ├── App.jsx
-│   │   └── api.js                # API calls to FastAPI backend
-│   └── public/
+
+src/
+├── components/
+│   ├── uploader/
+│   │   ├── FileUploader.jsx
+│   │   ├── UploadHelpSidebar.jsx
+│   │   └── RunStatus.jsx
+│   ├── output/
+│   │   └── OutputDownloader.jsx
+│   └── layout/
+│       └── MainLayout.jsx
+├── App.jsx
+└── index.js
+
 │
 ├── helpers/                       # Your existing helpers
 ├── databases/                     # Your existing database extractors .
