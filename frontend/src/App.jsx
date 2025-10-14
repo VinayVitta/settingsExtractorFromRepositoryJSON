@@ -1,15 +1,11 @@
-import React, { useState } from "react";
-import FileUploader from "./components/FileUploader";
-import OutputDownloader from "./components/OutputDownloader";
+import React from "react";
+import FileUploader from "./components/uploader/FileUploader";
 
 export default function App() {
-  const [outputs, setOutputs] = useState([]);
-
   return (
     <div>
-      <h1>QEM Repository Extractor</h1>
-      <FileUploader setOutputs={setOutputs} />
-      {outputs.length > 0 && <OutputDownloader outputs={outputs} />}
+      <h1>QDI - PS: Replicate Health Check</h1>
+      <FileUploader />
     </div>
   );
 }

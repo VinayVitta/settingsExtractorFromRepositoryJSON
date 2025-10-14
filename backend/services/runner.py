@@ -1,25 +1,37 @@
 from pathlib import Path
 import shutil
-import sys
-
+import sys, os
+from datetime import datetime
 # Import your main extraction functions
 sys.path.append(str(Path(__file__).resolve().parents[2]))
-from main import extract_all_settings, retrieveTables, utils, summary
+from main import extract_all_settings, retrieveTables, utils, summary, process_repository
 
 def run_extraction(json_paths, tsv_path, output_folder):
     """
     Wraps your main.py logic, but for programmatic call
     Returns a list of file paths for downloads
     """
-    # You can reuse most of your main.py logic here
-    # For brevity, just simulate output
-    # In practice: copy all logic from main.py and replace file paths with these arguments
-    output_files = []
+    """
+    Wraps main.process_repository()
+    """
+    folder = Path(output_folder)
+    folder.mkdir(parents=True, exist_ok=True)
 
-    # Example: run extraction on first JSON file
-    df = extract_all_settings(json_paths[0])
-    output_path = Path(output_folder) / "task_settings.csv"
-    utils.write_dataframe_to_csv(df, output_path)
-    output_files.append(str(output_path.name))
+    # Call the updated main method with list of JSONs
+    results = process_repository(json_paths, tsv_path)
 
-    return output_files
+    # Return filenames for frontend
+    return [Path(v) for v in results.values() if v]
+
+
+if __name__ == "__main__":
+    try:
+        # Example configuration (replace with your own paths)
+        folder_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\Dennis"
+        qem_export_path = os.path.join(folder_path, "AemTasks_2025-10-08_13.48.03.491.tsv")
+
+        process_repository(folder_path, qem_export_path)
+
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        sys.exit(1)

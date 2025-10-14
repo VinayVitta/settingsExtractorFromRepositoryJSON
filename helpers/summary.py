@@ -30,6 +30,7 @@ def create_summary(csv_result_file_path, output_docx_path):
 
     # Load data
     data_df = read_csv(csv_file_path)
+    data_df = data_df.astype(str)
     duckdb.register("data_df", data_df)
 
     # Query groups

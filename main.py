@@ -66,7 +66,6 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 import helpers.bigQueryWriteData as bigQueryWriteData
 
-
 # ==============================================================================
 # Registry Mappings
 # ==============================================================================
@@ -165,7 +164,7 @@ def extract_all_settings(json_file_path: str) -> pd.DataFrame:
 # Main Function
 # ==============================================================================
 
-def process_repository(folder_path: str, qem_export_path: str) -> Dict[str, str]:
+def process_repository(folder_path_or_files, qem_export_path: str) -> Dict[str, str]:
     """
     Orchestrates the end-to-end extraction and export process.
 
@@ -176,12 +175,19 @@ def process_repository(folder_path: str, qem_export_path: str) -> Dict[str, str]
     Returns:
         Dict[str, str]: Dictionary mapping output file names to file paths.
     """
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    json_file_paths = glob.glob(os.path.join(folder_path, "*.json"))
+    # Detect input type
+    if isinstance(folder_path_or_files, (list, tuple)):
+        json_file_paths = folder_path_or_files
+        # Use folder of first JSON for output
+        folder_path = str(Path(json_file_paths[0]).parent)
+    else:
+        folder_path = folder_path_or_files
+        json_file_paths = glob.glob(os.path.join(folder_path, "*.json"))
+
     if not json_file_paths:
         raise FileNotFoundError(f"No JSON files found in {folder_path}")
 
-    # Create output directory
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = os.path.join(folder_path, f"run_output_{timestamp}")
     os.makedirs(output_dir, exist_ok=True)
 
@@ -230,7 +236,15 @@ def process_repository(folder_path: str, qem_export_path: str) -> Dict[str, str]
     }
 
     # Load and merge QEM data
-    qem_df = utils.load_and_prefix_columns(cleaned_qem_path, prefix="qem_")
+    qem_df = pd.read_csv(cleaned_qem_path, sep="\t", engine="python")
+    # Add prefix
+    qem_df = qem_df.add_prefix("qem_")
+    # Find the correct columns (case-insensitive)
+    qem_task_col = next((c for c in qem_df.columns if c.lower() == "qem_task"), None)
+    qem_server_col = next((c for c in qem_df.columns if c.lower() == "qem_server"), None)
+
+    if not qem_task_col or not qem_server_col:
+        raise KeyError(f"Required QEM columns not found. Columns: {qem_df.columns.tolist()}")
     qem_path = os.path.join(output_dir, f"qem_data_{timestamp}.csv")
     utils.write_dataframe_to_csv(qem_df, qem_path)
     output_paths["qem_export"] = qem_path
@@ -242,7 +256,7 @@ def process_repository(folder_path: str, qem_export_path: str) -> Dict[str, str]
     task_qem_merged = combined_task_df.merge(
         qem_df,
         left_on=['task_name', 'json_file_name'],
-        right_on=['qem_Task', 'qem_Server'],
+        right_on=[qem_task_col, qem_server_col],
         how='left'
     )
 
@@ -263,7 +277,6 @@ def process_repository(folder_path: str, qem_export_path: str) -> Dict[str, str]
     merged_path = os.path.join(output_dir, f"exportRepositoryCSV_{timestamp}.csv")
     utils.write_dataframe_to_csv(merged_df, merged_path)
     output_paths["merged"] = merged_path
-
 
     # Generate Word summary
     summary_path = os.path.join(output_dir, f"task_summary_{timestamp}.docx")

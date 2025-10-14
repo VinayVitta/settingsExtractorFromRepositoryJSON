@@ -1,37 +1,66 @@
 from fastapi import APIRouter, UploadFile, File
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 import os
-from services.runner import run_extraction
+from pathlib import Path
 import uuid
+from services.runner import run_extraction  # make sure this exists
 
 router = APIRouter()
 
-UPLOAD_DIR = "backend/temp_uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = Path("backend/temp_uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+# ---------------------------
+# Download endpoint
+# ---------------------------
+@router.get("/download/{file_path:path}")
+async def download_file(file_path: str):
+    """
+    Download a file by relative path
+    """
+    full_path = UPLOAD_DIR / file_path
+    if full_path.exists():
+        return FileResponse(full_path, filename=full_path.name, media_type='application/octet-stream')
+    return {"error": f"File not found: {full_path}"}
+
+
+# ---------------------------
+# Upload + Run endpoint
+# ---------------------------
 @router.post("/run")
 async def upload_and_run(json_files: list[UploadFile] = File(...), tsv_file: UploadFile = File(...)):
     """
-    Accept multiple JSON files and one TSV file.
-    Runs the extraction logic and returns download links for results.
+    Accept multiple JSON files + one TSV file.
+    Runs extraction and returns relative paths for download.
     """
     temp_id = str(uuid.uuid4())
-    temp_folder = os.path.join(UPLOAD_DIR, temp_id)
-    os.makedirs(temp_folder, exist_ok=True)
+    temp_folder = UPLOAD_DIR / temp_id
+    temp_folder.mkdir(parents=True, exist_ok=True)
 
-    # Save files
+    # Save JSON files
     saved_jsons = []
     for json_file in json_files:
-        path = os.path.join(temp_folder, json_file.filename)
+        path = temp_folder / json_file.filename
         with open(path, "wb") as f:
             f.write(await json_file.read())
         saved_jsons.append(path)
 
-    tsv_path = os.path.join(temp_folder, tsv_file.filename)
+    # Save TSV file
+    tsv_path = temp_folder / tsv_file.filename
     with open(tsv_path, "wb") as f:
         f.write(await tsv_file.read())
 
-    # Run your existing main logic
+    # Run extraction
     output_files = run_extraction(saved_jsons, tsv_path, temp_folder)
 
-    return JSONResponse({"outputs": output_files})
+    # Convert all output paths to **relative** paths
+    def relative_paths(obj):
+        if isinstance(obj, Path):
+            return str(obj.relative_to(UPLOAD_DIR))
+        elif isinstance(obj, list):
+            return [relative_paths(i) for i in obj]
+        elif isinstance(obj, dict):
+            return {k: relative_paths(v) for k, v in obj.items()}
+        return obj
+
+    return JSONResponse({"outputs": relative_paths(output_files)})
