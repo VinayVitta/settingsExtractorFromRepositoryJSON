@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from routers import extract, download
+from routers import extract, download, endpoints_info
 
 # --- NEW IMPORTS for ABSOLUTE PATH FIX ---
 from pathlib import Path
@@ -9,7 +9,7 @@ import os
 import sys  # Added for graceful exit if path fails
 
 app = FastAPI(title="QDI - PS: Replicate Health Check")
-
+app.include_router(endpoints_info.router, prefix="/info", tags=["Supported Endpoints"])
 # --- ABSOLUTE PATH FIX & VALIDATION ---
 # 1. Determine the directory of the currently executing file (backend/)
 BASE_DIR = Path(__file__).resolve().parent
@@ -49,6 +49,7 @@ app.add_middleware(
 # These routes will handle requests starting with /extract and /download
 app.include_router(extract.router, prefix="/extract", tags=["extract"])
 app.include_router(download.router, prefix="/download", tags=["download"])
+app.include_router(endpoints_info.router, tags=["Info"])
 
 # --- 3. SERVE STATIC FRONTEND FILES (CRITICAL FIX) ---
 # This must be the *last* route definition.
