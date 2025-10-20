@@ -70,7 +70,7 @@ def extract_schedule_settings(json_data):
 
 def extract_server_data_to_dataframe(json_file_path):
     try:
-        with open(json_file_path, 'r') as f:
+        with open(json_file_path, 'r', encoding="utf-8-sig") as f:
             json_data = json.load(f)
         data, column_names = extract_schedule_settings(json_data)
         if data:

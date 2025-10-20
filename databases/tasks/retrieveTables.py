@@ -67,7 +67,7 @@ def extract_tables_dataframe(json_file_name, json_file_path):
                           Returns an empty DataFrame on error.
     """
     try:
-        with open(json_file_path, 'r') as f:
+        with open(json_file_path, 'r', encoding="utf-8-sig") as f:
             json_content = json.load(f)
         return extract_tables(json_file_name, json_content)
     except (FileNotFoundError, json.JSONDecodeError) as e:

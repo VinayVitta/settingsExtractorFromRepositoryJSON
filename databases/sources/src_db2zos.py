@@ -1,6 +1,11 @@
+import logging
+
 import pandas as pd
 import json
 import re
+from helpers.logger_config import setup_logger
+
+logging = setup_logger(__name__)
 
 
 def extract_db2zos_settings(json_data, source_ep_name):
@@ -25,6 +30,7 @@ def extract_db2zos_settings(json_data, source_ep_name):
 
     for database in databases:
         if database['name'] == source_ep_name and database['type_id'] == 'DB2ZOS_NATIVE_COMPONENT_TYPE':
+            logging.debug(f" Initiate fetching DB2ZOS_NATIVE_COMPONENT_TYPE details")
             db_settings = database.get('db_settings', {})  # Safely get nested settings
             db2zos_source_server = db_settings.get('server', None)
 

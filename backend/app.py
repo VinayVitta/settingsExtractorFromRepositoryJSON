@@ -1,42 +1,30 @@
+import os
+import sys
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from routers import extract, download, endpoints_info
+from dotenv import load_dotenv
 
-# --- NEW IMPORTS for ABSOLUTE PATH FIX ---
-from pathlib import Path
-import os
-import sys  # Added for graceful exit if path fails
-
-app = FastAPI(title="QDI - PS: Replicate Health Check")
-app.include_router(endpoints_info.router, prefix="/info", tags=["Supported Endpoints"])
-# --- ABSOLUTE PATH FIX & VALIDATION ---
-# 1. Determine the directory of the currently executing file (backend/)
+# --- Add backend root to sys.path if needed ---
 BASE_DIR = Path(__file__).resolve().parent
-# 2. Construct the absolute path to the 'frontend/build' folder
-# This path is now immune to changes in the service's starting directory.
-STATIC_FILES_DIR = BASE_DIR.parent / "frontend" / "build"
+sys.path.append(str(BASE_DIR))  # ensures helpers and routers are importable
 
-# --- CRITICAL PATH CHECK FOR SERVICE DEPLOYMENT ---
-# We explicitly check for the required index.html file to ensure the frontend build ran.
-INDEX_FILE = STATIC_FILES_DIR / "index.html"
+# --- Load environment variables ---
+ENV_PATH = BASE_DIR / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
 
-if not INDEX_FILE.exists():
-    # Print to standard error so the service manager may log this more easily
-    print(f"CRITICAL ERROR: 'index.html' not found in static files directory: {STATIC_FILES_DIR}", file=sys.stderr)
-    print("ACTION REQUIRED: Ensure you have run 'npm install' and 'npm run build' in the frontend directory on this server.", file=sys.stderr)
-    # Raising an exception will often be logged more clearly by the service manager
-    raise FileNotFoundError(f"Required file 'index.html' not found at: {INDEX_FILE}. Did you run the frontend build?")
+# --- Logger ---
+from helpers.logger_config import setup_logger
+logger = setup_logger("app")
 
-# --- 1. CORS Configuration ---
-# ✅ Allow frontend origins (local + network) for API calls (e.g., during dev)
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://192.168.56.1:3000"
-]
+# --- FastAPI App ---
+app = FastAPI(title="QDI - PS: Replicate Health Check")
 
-# Apply the CORS Middleware
+# --- CORS configuration ---
+FRONTEND_ORIGINS = os.getenv("FRONTEND_ORIGINS", "http://localhost:3000")
+origins = [origin.strip() for origin in FRONTEND_ORIGINS.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -45,17 +33,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- 2. API Routers ---
-# These routes will handle requests starting with /extract and /download
+# --- Import routers ---
+from backend.routers import extract, download, endpoints_info
+
 app.include_router(extract.router, prefix="/extract", tags=["extract"])
 app.include_router(download.router, prefix="/download", tags=["download"])
 app.include_router(endpoints_info.router, tags=["Info"])
 
-# --- 3. SERVE STATIC FRONTEND FILES (CRITICAL FIX) ---
-# This must be the *last* route definition.
+# --- Serve frontend static files ---
+STATIC_FILES_DIR = BASE_DIR.parent / "frontend" / "build"
+INDEX_FILE = STATIC_FILES_DIR / "index.html"
+
+if not INDEX_FILE.exists():
+    logger.error(f"Critical error: index.html not found in {STATIC_FILES_DIR}")
+    raise FileNotFoundError(f"index.html missing. Build frontend first.")
+
 app.mount(
     "/",
-    # We now use the calculated absolute path (STATIC_FILES_DIR)
     StaticFiles(directory=STATIC_FILES_DIR, html=True),
     name="static_files"
 )
+
+# --- Startup / Shutdown events ---
+@app.on_event("startup")
+async def startup_event():
+    logger.info(" Backend service started.")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info(" Backend service stopped.")

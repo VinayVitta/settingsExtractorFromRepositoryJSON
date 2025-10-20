@@ -52,9 +52,10 @@ export default function SupportedSourcesTargets() {
   const [targets, setTargets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const apiBase = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
-    fetch("http://localhost:8000/info/supported")
+    fetch(`${apiBase}/info/supported`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);

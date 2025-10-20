@@ -15,7 +15,7 @@ def extract_server_settings(json_data):
     Extracts task settings from a JSON data structure for a specific task name.
     Returns a tuple of (data, column_names) or empty lists if not found.
     """
-    logging.debug(f"Initiate fetching Replicate server settings")
+    logging.info(f"Initiate fetching Replicate server settings")
     replicate_server = None
     description = json_data.get('description', '')
     match = re.search(r"Host name:\s([a-zA-Z0-9.-]+)", description)
@@ -60,7 +60,7 @@ def extract_server_settings(json_data):
 
 def extract_server_data_to_dataframe(json_file_path):
     try:
-        with open(json_file_path, 'r') as f:
+        with open(json_file_path, 'r', encoding="utf-8-sig") as f:
             json_data = json.load(f)
         data, column_names = extract_server_settings(json_data)
         if data:

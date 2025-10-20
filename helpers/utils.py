@@ -8,7 +8,7 @@ import pandas as pd
 
 # Function to read JSON data from a file
 def read_json_from_file(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8-sig") as file:
         data = json.load(file)
     return data
 

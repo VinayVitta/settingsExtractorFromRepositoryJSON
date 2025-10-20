@@ -45,4 +45,4 @@ if results:
     summary_df = pd.DataFrame(results).sort_values(by=["db_type", "used_in_tasks"], ascending=[True, False])
     print(summary_df)
 else:
-    print("⚠️ No matching settings found for the specified DB types.")
+    print("No matching settings found for the specified DB types.")

@@ -1,8 +1,9 @@
 import pandas as pd
 import json
 import re
+from helpers.logger_config import setup_logger
 
-
+logging = setup_logger(__name__)
 def extract_oracle_settings(json_data, source_ep_name):
     """
     Extracts Oracle-specific settings from a JSON data structure.
@@ -25,6 +26,7 @@ def extract_oracle_settings(json_data, source_ep_name):
 
     for database in databases:
         if database['name'] == source_ep_name and database['type_id'] == 'ORACLE_COMPONENT_TYPE':
+            logging.debug("Initiate Oracle Settings Extractor")
             db_settings = database.get('db_settings', {})  # Safely get nested settings
             orc_source_server = db_settings.get('server', None)
 
