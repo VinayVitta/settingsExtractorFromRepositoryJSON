@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Request
+from fastapi import APIRouter, UploadFile, File, Request, Form
 from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 import uuid
@@ -48,7 +48,8 @@ async def download_file(file_path: str, request: Request):
 async def upload_and_run(
     request: Request,
     json_files: list[UploadFile] = File(...),
-    tsv_file: UploadFile = File(...)
+    tsv_file: UploadFile = File(...),
+    include_all_states: bool = Form(False)  #  new checkbox param, default is False
 ):
     """
     Accept multiple JSON files + one TSV file.
@@ -61,6 +62,7 @@ async def upload_and_run(
 
     ui_logger.info(f"Upload request from {client_ip} — temp folder: {temp_folder}")
     backend_logger.info(f"Saving uploaded files to {temp_folder}")
+    backend_logger.info(f"Include all states: {include_all_states}")
 
     saved_jsons = []
 
@@ -83,7 +85,7 @@ async def upload_and_run(
 
         # Run extraction
         backend_logger.info(f"Starting extraction for {client_ip} in {temp_folder}")
-        output_files = run_extraction(saved_jsons, tsv_path, temp_folder)
+        output_files = run_extraction(saved_jsons, tsv_path, temp_folder, include_all_states=include_all_states)
         backend_logger.info(f"Extraction completed for {client_ip}")
 
         # Convert to relative paths

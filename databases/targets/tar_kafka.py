@@ -66,7 +66,7 @@ def extract_kafka_data_to_dataframe(json_file_path, target_name):
         pd.DataFrame: Extracted Kafka settings.
     """
     try:
-        with open(json_file_path, 'r') as f:
+        with open(json_file_path, 'r', encoding="utf-8-sig") as f:
             json_content = json.load(f)
         data, column_names = extract_kafka_settings(json_content, target_name)
         if data:

@@ -54,7 +54,7 @@ def extract_postgres_data_to_dataframe(json_path, source_name):
         pandas.DataFrame: A DataFrame of extracted PostgreSQL settings.
     """
     try:
-        with open(json_path, 'r') as f:
+        with open(json_path, 'r' , encoding="utf-8-sig") as f:
             json_content = json.load(f)
         data, column_names = extract_postgres_settings(json_content, source_name)
         return pd.DataFrame(data, columns=column_names) if data else pd.DataFrame()

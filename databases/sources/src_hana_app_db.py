@@ -79,7 +79,7 @@ def extract_sap_hana_data_to_dataframe(json_file_path, source_name):
         pandas.DataFrame: A Pandas DataFrame containing the extracted data.
     """
     try:
-        with open(json_file_path, 'r') as f:
+        with open(json_file_path, 'r' , encoding="utf-8-sig") as f:
             json_content = json.load(f)
         data, column_names = extract_sap_hana_settings(json_content, source_name)
         if data:

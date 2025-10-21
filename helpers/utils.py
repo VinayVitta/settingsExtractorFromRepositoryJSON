@@ -98,6 +98,16 @@ def clean_multiline_tsv(input_file_path, output_file_path=None):
     return output_file_path
 
 
+def apply_state_filter(query: str, include_all_states: bool) -> str:
+    """
+    Injects or removes the qem_State filter in a given query dynamically.
+    """
+    if include_all_states:
+        # Remove or neutralize the 'LOWER(qem_State) = 'running'' condition if present
+        query = query.replace("WHERE LOWER(qem_State) = 'running'", "WHERE 1=1")
+        query = query.replace("AND LOWER(qem_State) = 'running'", "")
+    return query
+
 
 # Example usage
 file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\AemTasks_2025-04-25_13.35.53.8.tsv"

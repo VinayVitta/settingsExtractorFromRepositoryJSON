@@ -3,24 +3,28 @@ import pandas as pd
 import json
 
 
-def extract_logstream_settings(json_data, target_ep_name):
-
+def extract_tar_sqlserver_settings(json_data, target_ep_name):
     databases = json_data.get('cmd.replication_definition', {}).get('databases', [])
     data = []
     column_names = []
 
     for database in databases:
         # print(database['name'])
-        if database['name'] == target_ep_name and database['type_id'] in ['LOG_STREAM_COMPONENT_TYPE']:
+        if database['name'] == target_ep_name and database['type_id'] in ['SQL_SERVER_COMPONENT_TYPE']:
             db_settings = database.get('db_settings', {})
 
             row_data = {
                 'target_endpoint_name': database.get('name'),
                 'target_db_type': database.get('type_id'),
-                'logStream_path': db_settings.get('path'),
-                'target_server': "LogStream_Connection",
-                'logStream_retention_time': db_settings.get('retentionmaxagehours'),
-                'logStream_retention_size_MB': db_settings.get('retentionmaxsizemb')
+                'target_username': db_settings.get('username'),
+                'target_server': db_settings.get('server'),
+                'target_sqlserver_database': db_settings.get('database'),
+                'target_sqlserver_use_win_auth': db_settings.get('useWindowsAuthentication', True),
+                'target_sqlserver_executeTimeout': db_settings.get('executeTimeout'),
+                'target_sqlserver_safeguardPolicy': db_settings.get('safeguardPolicy'),
+                'target_sqlserver_useBCPFullLoad': db_settings.get('useBCPFullLoad', True),
+                'target_sqlserver_BCPPacketSize': db_settings.get('BCPPacketSize', 16384),
+
             }
             data.append(row_data)
             column_names = list(row_data.keys())
@@ -29,7 +33,7 @@ def extract_logstream_settings(json_data, target_ep_name):
     return data, column_names
 
 
-def extract_logstream_data_to_dataframe(json_file, target_name):
+def extract_tar_sqlserver_data_to_dataframe(json_file, target_name):
     """
     Reads a JSON file, extracts relevant Snowflake data, and returns a Pandas DataFrame.
 
@@ -44,7 +48,7 @@ def extract_logstream_data_to_dataframe(json_file, target_name):
     try:
         with open(json_file, 'r', encoding="utf-8-sig") as f:
             json_data = json.load(f)
-        data, column_names = extract_logstream_settings(json_data, target_name)
+        data, column_names = extract_tar_sqlserver_settings(json_data, target_name)
         if data:
             return pd.DataFrame(data, columns=column_names)
         else:
@@ -76,11 +80,11 @@ def main():
     """
     Main function to orchestrate the extraction and CSV writing.
     """
-    json_file_path = r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\Customers\EdwardJones\PlatformReview\filecloud-20250430192131\tlpreplcdc-004.json"
+    json_file_path = r"C:\MySW\Attunity\Replicate\data\imports\Replication_Definition.json"
     csv_file_path = r"C:\Users\VIT\Downloads\snowflake_settings.csv"
-    target_name = 'prod038_LogStream' #chnage source name
+    target_name = 'sqlserver_dev'  # chnage source name
 
-    null_df = extract_logstream_data_to_dataframe(json_file_path, target_name)
+    null_df = extract_tar_sqlserver_data_to_dataframe(json_file_path, target_name)
     print('aaaa')
     if not null_df.empty:
         # write_dataframe_to_csv(df, csv_file_path)

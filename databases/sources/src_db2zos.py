@@ -69,7 +69,7 @@ def extract_db2zos_data_to_dataframe(json_data, source_name):
                         Returns an empty DataFrame on error.
     """
     try:
-        with open(json_data, 'r') as f:
+        with open(json_data, 'r' , encoding="utf-8-sig") as f:
             json_content = json.load(f)
         data, column_names = extract_db2zos_settings(json_content, source_name)  # Pass json_content, not file path
         if data:

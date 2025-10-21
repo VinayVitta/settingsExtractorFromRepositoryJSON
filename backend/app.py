@@ -37,7 +37,7 @@ app.add_middleware(
 from backend.routers import extract, download, endpoints_info
 
 app.include_router(extract.router, prefix="/extract", tags=["extract"])
-app.include_router(download.router, prefix="/download", tags=["download"])
+app.include_router(download.router, prefix="/extract/download", tags=["download"])
 app.include_router(endpoints_info.router, tags=["Info"])
 
 # --- Serve frontend static files ---

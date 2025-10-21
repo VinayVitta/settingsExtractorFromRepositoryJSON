@@ -40,7 +40,7 @@ def extract_null_data_to_dataframe(json_file, target_name):
         empty DataFrame if an error occurs or no data is found.
     """
     try:
-        with open(json_file, 'r') as f:
+        with open(json_file, 'r', encoding="utf-8-sig") as f:
             json_data = json.load(f)
         data, column_names = extract_null_settings(json_data, target_name)
         if data:

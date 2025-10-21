@@ -13,7 +13,7 @@ backend_logger = setup_logger(__name__)
 ui_logger = setup_logger("ui_runner", ui=True)
 
 
-def run_extraction(json_paths, tsv_path, output_folder):
+def run_extraction(json_paths, tsv_path, output_folder, include_all_states = False):
     """
     Wraps your main.process_repository() logic for programmatic calls.
     Logs both backend and UI-level events.
@@ -27,7 +27,7 @@ def run_extraction(json_paths, tsv_path, output_folder):
 
     try:
         # Run the core process
-        results = process_repository(json_paths, tsv_path)
+        results = process_repository(json_paths, tsv_path, include_all_states)
 
         if not results:
             backend_logger.warning(f"No results returned from process_repository() for folder {folder}")

@@ -38,6 +38,7 @@ import databases.targets.tar_snowflake as tar_snowflake
 import databases.targets.tar_azure_adls as tar_azure_adls
 import databases.targets.tar_logStream as tar_logStream
 import databases.targets.tar_kafka as tar_kafka
+import databases.targets.tar_sqlserver as tar_sqlserver
 import databases.tasks.retrieveTaskSettings as retrieveTaskSettings
 import databases.tasks.retrieveTables as retrieveTables
 import databases.serverSettings.retrieveServerSettings as retrieveServerSettings
@@ -76,6 +77,7 @@ TARGET_EXTRACTORS = {
     "AZURE_ADLS_COMPONENT_TYPE": tar_azure_adls.extract_azure_adls_settings,
     "LOG_STREAM_COMPONENT_TYPE": tar_logStream.extract_logstream_settings,
     "KAFKA_COMPONENT_TYPE": tar_kafka.extract_kafka_settings,
+    "SQL_SERVER_COMPONENT_TYPE": tar_sqlserver.extract_tar_sqlserver_settings,
 }
 
 # -----------------------------------------------------------------------------
@@ -139,7 +141,7 @@ def extract_all_settings(json_file_path: str) -> pd.DataFrame:
 # -----------------------------------------------------------------------------
 # Repository processing
 # -----------------------------------------------------------------------------
-def process_repository(folder_path_or_files, qem_export_path: str) -> Dict[str, str]:
+def process_repository(folder_path_or_files, qem_export_path: str, include_all_states = False) -> Dict[str, str]:
     # Determine input type
     if isinstance(folder_path_or_files, (list, tuple)):
         json_file_paths = folder_path_or_files
@@ -243,7 +245,7 @@ def process_repository(folder_path_or_files, qem_export_path: str) -> Dict[str, 
 
     # Generate Word summary
     summary_path = os.path.join(output_dir, f"task_summary_{timestamp}.docx")
-    summary.create_summary(merged_path, summary_path)
+    summary.create_summary(merged_path, summary_path, include_all_states)
     output_paths["summary_doc"] = summary_path
     logger.info(" Processing completed successfully!")
     for k, v in output_paths.items():
