@@ -39,6 +39,7 @@ import databases.targets.tar_azure_adls as tar_azure_adls
 import databases.targets.tar_logStream as tar_logStream
 import databases.targets.tar_kafka as tar_kafka
 import databases.targets.tar_sqlserver as tar_sqlserver
+import databases.targets.tar_s3 as tar_s3
 import databases.tasks.retrieveTaskSettings as retrieveTaskSettings
 import databases.tasks.retrieveTables as retrieveTables
 import databases.serverSettings.retrieveServerSettings as retrieveServerSettings
@@ -78,6 +79,7 @@ TARGET_EXTRACTORS = {
     "LOG_STREAM_COMPONENT_TYPE": tar_logStream.extract_logstream_settings,
     "KAFKA_COMPONENT_TYPE": tar_kafka.extract_kafka_settings,
     "SQL_SERVER_COMPONENT_TYPE": tar_sqlserver.extract_tar_sqlserver_settings,
+    "S3_COMPONENT_TYPE": tar_s3.extract_tar_s3_settings,
 }
 
 # -----------------------------------------------------------------------------
