@@ -9,6 +9,8 @@ from helpers.utils import apply_state_filter  # Your helper from Option 1
 # Configure Logging
 logging = setup_logger(__name__)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(BASE_DIR, "docx", "QlikNewLogo.png")
 
 def read_csv(path):
     """Read CSV file into a Pandas DataFrame."""
@@ -122,7 +124,7 @@ def create_summary(csv_result_file_path, output_docx_path, include_all_states=Fa
         summary_tables,
         output_docx_path,
         title="QLik Replicate - Task Summary",
-        logo_path=r"C:\Users\VIT\OneDrive - QlikTech Inc\QlikVit\UDocs\Qlik New Logo.png"
+        logo_path=logo_path
     )
 
     logging.info(f"Summary document created: {output_docx_path}")

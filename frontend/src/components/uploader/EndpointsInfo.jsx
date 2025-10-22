@@ -119,11 +119,11 @@ export default function SupportedSourcesTargets() {
       <h3 style={styles.heading}>🔗 Supported Data Connectors</h3>
       <div style={styles.listContainer}>
         <div style={styles.listSection}>
-          <h4 style={styles.subHeading}>Source Connectors (Data Input)</h4>
+          <h4 style={styles.subHeading}>Source Endpoints</h4>
           {sources.length > 0 ? renderList(sources) : <p style={{ color: "#a0a0a0" }}>None configured.</p>}
         </div>
         <div style={styles.listSection}>
-          <h4 style={styles.subHeading}>Target Connectors (Data Output)</h4>
+          <h4 style={styles.subHeading}>Target Endpoints</h4>
           {targets.length > 0 ? renderList(targets) : <p style={{ color: "#a0a0a0" }}>None configured.</p>}
         </div>
       </div>
